@@ -413,14 +413,16 @@
                 
                 console.log('送信データ:', data);
                 
-                // Google Apps Scriptに送信（CORS対応版）
+                // Google Apps Scriptに送信（修正版）
+                const formData = new FormData();
+                for (const [key, value] of Object.entries(data)) {
+                    formData.append(key, value);
+                }
+                
                 const response = await fetch(GAS_WEB_APP_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // CORS制限を回避
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
+                    body: formData, // JSON形式ではなくFormData形式で送信
+                    mode: 'no-cors'
                 });
                 
                 // no-corsモードでは詳細なレスポンスが取得できないため、
