@@ -413,21 +413,38 @@
                 
                 console.log('送信データ:', data);
                 
-                // URLエンコード形式で送信（より確実）
-                const params = new URLSearchParams();
+                // iframe経由でGASに送信（確実な方法）
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+                
+                // GASに送信するためのフォームを作成
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = GAS_WEB_APP_URL;
+                form.target = iframe.name = 'gas_target_' + Date.now();
+                
+                // データをhiddenフィールドとして追加
                 for (const [key, value] of Object.entries(data)) {
-                    params.append(key, value);
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = value;
+                    form.appendChild(input);
                 }
                 
-                console.log('送信パラメータ:', params.toString());
+                document.body.appendChild(form);
                 
-                const response = await fetch(GAS_WEB_APP_URL, {
-                    method: 'POST',
-                    body: params,
-                    mode: 'no-cors'
-                });
+                // フォームを送信
+                form.submit();
                 
                 console.log('送信完了');
+                
+                // 少し待ってからクリーンアップ
+                setTimeout(() => {
+                    document.body.removeChild(form);
+                    document.body.removeChild(iframe);
+                }, 3000);
                 
                 // 成功メッセージを表示
                 document.getElementById('successMessage').style.display = 'block';
