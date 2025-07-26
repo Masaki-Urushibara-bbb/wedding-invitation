@@ -413,21 +413,21 @@
                 
                 console.log('送信データ:', data);
                 
-                // Google Apps Scriptに送信（修正版）
-                const formData = new FormData();
+                // URLエンコード形式で送信（より確実）
+                const params = new URLSearchParams();
                 for (const [key, value] of Object.entries(data)) {
-                    formData.append(key, value);
+                    params.append(key, value);
                 }
+                
+                console.log('送信パラメータ:', params.toString());
                 
                 const response = await fetch(GAS_WEB_APP_URL, {
                     method: 'POST',
-                    body: formData, // JSON形式ではなくFormData形式で送信
+                    body: params,
                     mode: 'no-cors'
                 });
                 
-                // no-corsモードでは詳細なレスポンスが取得できないため、
-                // 送信が完了したと仮定して成功処理を実行
-                console.log('送信完了（no-corsモード）');
+                console.log('送信完了');
                 
                 // 成功メッセージを表示
                 document.getElementById('successMessage').style.display = 'block';
